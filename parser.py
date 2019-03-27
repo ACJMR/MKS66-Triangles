@@ -68,7 +68,7 @@ def parse_file( fname, edges, polygons, transform, screen, color ):
 
         if line == 'sphere':
             #print 'SPHERE\t' + str(args)
-            add_sphere(edges,
+            add_sphere(polygons,
                        float(args[0]), float(args[1]), float(args[2]),
                        float(args[3]), step_3d)
 
@@ -149,5 +149,4 @@ def parse_file( fname, edges, polygons, transform, screen, color ):
                 z = 1
             else:
                 save_extension(screen, args[0])
-
         c+= 1

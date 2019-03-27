@@ -3,32 +3,70 @@ from matrix import *
 
 
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
-    add_edge(polygons,x0,y0,z0,x1,y1,z1)
-    add_edge(polygons,x1,y1,z1,x2,y2,z2)
-    add_edge(polygons,x0,y0,z0,x2,y2,z2)
+    add_point(polygons,x0,y0,z0)
+    add_point(polygons,x1,y1,z1)
+    add_point(polygons,x2,y2,z2)
     pass
 
 def draw_polygons( matrix, screen, color ):
     if len(matrix) < 3:
         print 'Need at least 3 points to draw'
         return
-
-    draw_lines(matrix,screen,color)
+    z = [0,0,1]
+    point = 0
+    while point < len(matrix) - 2:
+        norm = gen_normal(matrix[point][0],matrix[point][1],matrix[point][2],
+                    matrix[point+1][0],matrix[point+1][1],matrix[point+1][2],
+                    matrix[point+2][0],matrix[point+2][1],matrix[point+2][2])
+        if dot(norm,z) > 0:
+            draw_line( int(matrix[point][0]),
+                        int(matrix[point][1]),
+                        int(matrix[point+1][0]),
+                        int(matrix[point+1][1]),
+                        screen, color)
+            draw_line( int(matrix[point][0]),
+                        int(matrix[point][1]),
+                        int(matrix[point+2][0]),
+                        int(matrix[point+2][1]),
+                        screen, color)
+            draw_line( int(matrix[point+1][0]),
+                    int(matrix[point+1][1]),
+                    int(matrix[point+2][0]),
+                    int(matrix[point+2][1]),
+                    screen, color)
+        point+= 3
     pass
 
+def dot(A,B):
+    return A[0]*B[0] + A[1]*B[1] + A[2]*B[2]
+
+def gen_normal(x0,y0,z0,x1,y1,z1,x2,y2,z2):
+    Ax = x1 - x0
+    Ay = y1 - y0
+    Az = z1 - z0
+    Bx = x2 - x0
+    By = y2 - y0
+    Bz = z2 - z0
+    return cross(Ax,Ay,Az,Bx,By,Bz)
+
+def cross(x0,y0,z0,x1,y1,z1):
+    newx = y0*z1 - z0*y1
+    newy = z0*x1 - x0*z1
+    newz = x0*y1 - y0*x1
+    return [newx,newy,newz]
 
 def add_box( polygons, x, y, z, width, height, depth ):
     x1 = x + width
     y1 = y - height
     z1 = z - depth
-
+    #start top right, counter clockwise
     add_rect(polygons, x, y, z, x, y, z1, x, y1, z1, x, y1, z)
-    add_rect(polygons, x, y, z, x1, y, z, x1, y1, z, x, y1, z)
-    add_rect(polygons, x, y, z, x, y, z1, x1, y, z1, x1, y, z)
+    add_rect(polygons, x, y, z, x, y1, z, x1, y1, z, x1, y, z)
+    add_rect(polygons, x, y, z, x1, y, z, x1, y, z1, x, y, z1)
 
     x1,y1,z1,x,y,z = x,y,z,x1,y1,z1
 
-    add_rect(polygons, x, y, z, x, y, z1, x, y1, z1, x, y1, z)
+    add_rect(polygons, x, y, z, x, y1, z, x, y1, z1, x, y, z1)
     add_rect(polygons, x, y, z, x1, y, z, x1, y1, z, x, y1, z)
     add_rect(polygons, x, y, z, x, y, z1, x1, y, z1, x1, y, z)
 
@@ -44,7 +82,7 @@ def add_sphere(polygons, cx, cy, cz, r, step ):
     lat_start = 0
     lat_stop = step
     longt_start = 0
-    longt_stop = step
+    longt_stop = step - 1
 
     step+= 1
     for lat in range(lat_start, lat_stop):
@@ -89,7 +127,7 @@ def generate_sphere( cx, cy, cz, r, step ):
 
 def add_torus(polygons, cx, cy, cz, r0, r1, step ):
     points = generate_torus(cx, cy, cz, r0, r1, step)
-    s = step * (step+1)
+    s = step * (step)
 
     lat_start = 0
     lat_stop = step
@@ -98,8 +136,6 @@ def add_torus(polygons, cx, cy, cz, r0, r1, step ):
 
     for lat in range(lat_start, lat_stop):
         for longt in range(longt_start, longt_stop):
-            index = lat * step + longt
-
             index = lat * step + longt
 
             index2 = (index + step )%s
