@@ -149,7 +149,7 @@ def parse_file( fname, edges, polygons, transform, screen, color ):
                 draw_polygons(polygons,screen,color)
 
             if line == 'display':
-                #display(screen)
+                display(screen)
                 z = 1
             else:
                 save_extension(screen, args[0])
