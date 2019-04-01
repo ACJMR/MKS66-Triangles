@@ -47,7 +47,7 @@ The file follows the following format:
 
 See the file script for an example of the file format
 """
-ARG_COMMANDS = [ 'box', 'sphere', 'torus', 'circle', 'bezier', 'hermite', 'line', 'scale', 'move', 'rotate', 'save' ]
+ARG_COMMANDS = [ 'box', 'sphere', 'torus', 'circle', 'bezier', 'hermite', 'line', 'scale', 'move', 'rotate', 'save','color']
 
 def parse_file( fname, edges, polygons, transform, screen, color ):
 
@@ -138,11 +138,15 @@ def parse_file( fname, edges, polygons, transform, screen, color ):
         elif line == 'clear':
             edges = []
             polygons = []
+        elif line == 'color':
+            color = [(args[0]), (args[1]), (args[2])]
 
         elif line == 'display' or line == 'save':
             clear_screen(screen)
-            draw_lines(edges, screen, color)
-            draw_polygons(polygons,screen,color)
+            if (len(edges)!=0):
+                draw_lines(edges, screen, color)
+            if (len(polygons)!=0):
+                draw_polygons(polygons,screen,color)
 
             if line == 'display':
                 #display(screen)

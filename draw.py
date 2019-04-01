@@ -18,7 +18,7 @@ def draw_polygons( matrix, screen, color ):
         norm = gen_normal(matrix[point][0],matrix[point][1],matrix[point][2],
                     matrix[point+1][0],matrix[point+1][1],matrix[point+1][2],
                     matrix[point+2][0],matrix[point+2][1],matrix[point+2][2])
-        if dot(norm,z) > 0:
+        if dot(norm,z) >= 0:
             draw_line( int(matrix[point][0]),
                         int(matrix[point][1]),
                         int(matrix[point+1][0]),
@@ -77,32 +77,31 @@ def add_rect(polygons,x0,y0,z0,x1,y1,z1,x2,y2,z2,x3,y3,z3):
 
 def add_sphere(polygons, cx, cy, cz, r, step ):
     points = generate_sphere(cx, cy, cz, r, step)
-    s = step * (step+1)
+    s = len(points)
 
     lat_start = 0
     lat_stop = step
     longt_start = 0
-    longt_stop = step - 1
+    longt_stop = step
 
-    step+= 1
     for lat in range(lat_start, lat_stop):
-        for longt in range(longt_start, longt_stop+1):
-            index = lat * step + longt
-
-            index2 = (index + step )%s
-            add_rect(polygons, points[index][0],
-                     points[index][1],
-                     points[index][2],
-                     points[(index+1)%s][0],
-                     points[(index+1)%s][1],
-                     points[(index+1)%s][2],
-                     points[(index2+1)%s][0],
-                     points[(index2+1)%s][1],
-                     points[(index2+1)%s][2],
+        for longt in range(longt_start, longt_stop-1):
+            index0=((step+1)*lat+longt+1)%s
+            index1=((step+1)*(lat+1)+longt+2)%s
+            index2=((step+1)*(lat+1)+longt+1)%s
+            index3=((step+1)*lat+longt)%s
+            add_rect(polygons,points[index0][0],
+                     points[index0][1],
+                     points[index0][2],
+                     points[index1][0],
+                     points[index1][1],
+                     points[index1][2],
                      points[index2][0],
                      points[index2][1],
-                     points[index2][2]
-                     )
+                     points[index2][2],
+                     points[index3][0],
+                     points[index3][1],
+                     points[index3][2])
 
 def generate_sphere( cx, cy, cz, r, step ):
     points = []
@@ -127,7 +126,7 @@ def generate_sphere( cx, cy, cz, r, step ):
 
 def add_torus(polygons, cx, cy, cz, r0, r1, step ):
     points = generate_torus(cx, cy, cz, r0, r1, step)
-    s = step * (step)
+    s = len(points)
 
     lat_start = 0
     lat_stop = step
@@ -136,22 +135,22 @@ def add_torus(polygons, cx, cy, cz, r0, r1, step ):
 
     for lat in range(lat_start, lat_stop):
         for longt in range(longt_start, longt_stop):
-            index = lat * step + longt
-
-            index2 = (index + step )%s
-            add_rect(polygons, points[index][0],
-                     points[index][1],
-                     points[index][2],
-                     points[(index+1)%s][0],
-                     points[(index+1)%s][1],
-                     points[(index+1)%s][2],
-                     points[(index2+1)%s][0],
-                     points[(index2+1)%s][1],
-                     points[(index2+1)%s][2],
+            index0=(step*(lat)+longt)%s
+            index1=(step*(lat)+(longt+1)%longt_stop)%s
+            index2=(step*(lat+1)+(longt+1)%longt_stop)%s
+            index3=(step*(lat+1)+longt)%s
+            add_rect(polygons,points[index0][0],
+                     points[index0][1],
+                     points[index0][2],
+                     points[index1][0],
+                     points[index1][1],
+                     points[index1][2],
                      points[index2][0],
                      points[index2][1],
-                     points[index2][2]
-                     )
+                     points[index2][2],
+                     points[index3][0],
+                     points[index3][1],
+                     points[index3][2])
 
 def generate_torus( cx, cy, cz, r0, r1, step ):
     points = []
